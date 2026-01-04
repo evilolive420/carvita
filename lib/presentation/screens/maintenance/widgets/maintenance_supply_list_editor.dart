@@ -136,7 +136,7 @@ class _MaintenanceSupplyListEditorState
                 icon: Icon(Icons.add_circle_outline, size: 20),
                 label: Text(loc.addSupply),
                 style: TextButton.styleFrom(
-                   foregroundColor: isDark ? AppColors.accentBlue : Theme.of(context).colorScheme.primary,
+                   foregroundColor: isDark ? AppColors.secondaryBlue : Theme.of(context).colorScheme.primary,
                 ),
               ),
           ],
