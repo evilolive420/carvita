@@ -31,6 +31,7 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
   late TextEditingController _mileageController;
   late TextEditingController _boughtDateController;
   late TextEditingController _modelController;
+  late TextEditingController _modelYearController;
   late TextEditingController _plateNumberController;
   late TextEditingController _vinController;
   late TextEditingController _engineNumberController;
@@ -53,6 +54,9 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
       text: v != null ? DateFormat.yMMMd().format(v.boughtDate) : '',
     );
     _modelController = TextEditingController(text: v?.model ?? '');
+    _modelYearController = TextEditingController(
+      text: v?.modelYear?.toString() ?? '',
+    );
     _plateNumberController = TextEditingController(text: v?.plateNumber ?? '');
     _vinController = TextEditingController(text: v?.vin ?? '');
     _engineNumberController = TextEditingController(
@@ -67,6 +71,7 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
     _mileageController.dispose();
     _boughtDateController.dispose();
     _modelController.dispose();
+    _modelYearController.dispose();
     _plateNumberController.dispose();
     _vinController.dispose();
     _engineNumberController.dispose();
@@ -199,6 +204,11 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
         mileageLastUpdated = widget.vehicle!.mileageLastUpdated;
       } else {}
 
+      int? modelYear;
+      if (_modelYearController.text.trim().isNotEmpty) {
+        modelYear = int.parse(_modelYearController.text.trim());
+      }
+
       final vehicleData = Vehicle(
         id: widget.vehicle?.id,
         name: _nameController.text.trim(),
@@ -222,6 +232,7 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
             _engineNumberController.text.trim().isNotEmpty
                 ? _engineNumberController.text.trim()
                 : null,
+        modelYear: modelYear,
       );
 
       final cubit = context.read<VehicleCubit>();
@@ -402,6 +413,23 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
                   _modelController,
                   AppLocalizations.of(context)!.vehicleModel,
                   AppLocalizations.of(context)!.vehicleModelHint,
+                ),
+                formField(
+                  _modelYearController,
+                  AppLocalizations.of(context)!.modelYear,
+                  AppLocalizations.of(context)!.modelYearHint,
+                  keyboardType: TextInputType.number,
+                  validator: (val) {
+                    if (val != null && val.trim().isNotEmpty) {
+                      final year = int.tryParse(val.trim());
+                      if (year == null || val.trim().length != 4) {
+                        return AppLocalizations.of(context)!.invalidOptionalEntry(
+                          AppLocalizations.of(context)!.modelYear,
+                        );
+                      }
+                    }
+                    return null;
+                  },
                 ),
                 formField(
                   _plateNumberController,
