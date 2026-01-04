@@ -966,7 +966,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         _triggerNotificationReschedule();
                       }
                     },
-                    activeColor: Theme.of(context).colorScheme.primary,
+                    activeThumbColor: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 _buildSettingItem(
