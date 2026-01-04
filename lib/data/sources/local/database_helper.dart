@@ -6,6 +6,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:carvita/data/models/maintenance_plan_item.dart';
 import 'package:carvita/data/models/service_log_entry.dart';
 import 'package:carvita/data/models/service_log_performed_item_link.dart';
+import 'package:carvita/data/models/standard_maintenance_item.dart';
 import 'package:carvita/data/models/vehicle.dart';
 
 class DatabaseHelper {
@@ -15,7 +16,7 @@ class DatabaseHelper {
 
   static Database? _database;
   static const String dbName = 'carvita_v1.db';
-  static const int _dbVersion = 1;
+  static const int _dbVersion = 2;
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -29,8 +30,68 @@ class DatabaseHelper {
       path,
       version: _dbVersion,
       onCreate: _onCreate,
-      // onUpgrade: _onUpgrade,
+      onUpgrade: _onUpgrade,
     );
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await _createStandardMaintenanceItemsTable(db);
+      await _seedStandardMaintenanceItems(db);
+    }
+  }
+
+  Future<void> _createStandardMaintenanceItemsTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE standard_maintenance_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        itemName TEXT NOT NULL,
+        intervalTimeMonths INTEGER,
+        intervalMileage INTEGER,
+        firstIntervalTimeMonths INTEGER,
+        firstIntervalMileage INTEGER,
+        notes TEXT
+      )
+    ''');
+  }
+
+  Future<void> _seedStandardMaintenanceItems(Database db) async {
+    final List<StandardMaintenanceItem> initialItems = [
+      StandardMaintenanceItem(
+        itemName: 'Oil Change',
+        intervalTimeMonths: 6,
+        intervalMileage: 5000,
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Tire Rotation',
+        intervalTimeMonths: 6,
+        intervalMileage: 5000,
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Brake Inspection',
+        intervalTimeMonths: 12,
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Air Filter Replacement',
+        intervalTimeMonths: 12,
+        intervalMileage: 15000,
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Coolant Flush',
+        intervalTimeMonths: 24,
+        intervalMileage: 30000,
+      ),
+    ];
+
+    for (var item in initialItems) {
+      Map<String, dynamic> itemMap = item.toMap();
+      itemMap.remove('id');
+      await db.insert(
+        'standard_maintenance_items',
+        itemMap,
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+    }
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -86,6 +147,9 @@ class DatabaseHelper {
         FOREIGN KEY (maintenancePlanItemId) REFERENCES maintenance_plan_items (id) ON DELETE SET NULL 
       )
     ''');
+
+    await _createStandardMaintenanceItemsTable(db);
+    await _seedStandardMaintenanceItems(db);
   }
 
   // --- vehicle CRUD ---
@@ -383,6 +447,68 @@ class DatabaseHelper {
           ),
         )
         .toList();
+  }
+
+  // --- Standard Maintenance Item CRUD ---
+
+  Future<List<StandardMaintenanceItem>> getAllStandardMaintenanceItems() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'standard_maintenance_items',
+      orderBy: 'itemName ASC',
+    );
+    if (maps.isEmpty) {
+      return [];
+    }
+    return List.generate(
+      maps.length,
+      (i) => StandardMaintenanceItem.fromMap(maps[i]),
+    );
+  }
+
+  Future<StandardMaintenanceItem?> getStandardMaintenanceItemById(
+    int id,
+  ) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'standard_maintenance_items',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (maps.isNotEmpty) {
+      return StandardMaintenanceItem.fromMap(maps.first);
+    }
+    return null;
+  }
+
+  Future<int> insertStandardMaintenanceItem(StandardMaintenanceItem item) async {
+    final db = await database;
+    Map<String, dynamic> itemMap = item.toMap();
+    itemMap.remove('id');
+    return await db.insert(
+      'standard_maintenance_items',
+      itemMap,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<int> updateStandardMaintenanceItem(StandardMaintenanceItem item) async {
+    final db = await database;
+    return await db.update(
+      'standard_maintenance_items',
+      item.toMap(),
+      where: 'id = ?',
+      whereArgs: [item.id],
+    );
+  }
+
+  Future<int> deleteStandardMaintenanceItem(int id) async {
+    final db = await database;
+    return await db.delete(
+      'standard_maintenance_items',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   Future<void> close() async {

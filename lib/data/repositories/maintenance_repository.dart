@@ -1,6 +1,7 @@
 import 'package:carvita/data/models/maintenance_plan_item.dart';
 import 'package:carvita/data/models/service_log_entry.dart';
 import 'package:carvita/data/models/service_log_performed_item_link.dart';
+import 'package:carvita/data/models/standard_maintenance_item.dart';
 import 'package:carvita/data/sources/local/database_helper.dart';
 
 class MaintenanceRepository {
@@ -55,5 +56,22 @@ class MaintenanceRepository {
     int vehicleId,
   ) async {
     return await _dbHelper.getPerformedItemLinksForVehicle(vehicleId);
+  }
+
+  // --- Standard Maintenance Item Methods ---
+  Future<List<StandardMaintenanceItem>> getAllStandardItems() async {
+    return await _dbHelper.getAllStandardMaintenanceItems();
+  }
+
+  Future<void> addStandardItem(StandardMaintenanceItem item) async {
+    await _dbHelper.insertStandardMaintenanceItem(item);
+  }
+
+  Future<void> updateStandardItem(StandardMaintenanceItem item) async {
+    await _dbHelper.updateStandardMaintenanceItem(item);
+  }
+
+  Future<void> deleteStandardItem(int itemId) async {
+    await _dbHelper.deleteStandardMaintenanceItem(itemId);
   }
 }

@@ -842,5 +842,60 @@
   "themeColor": "Theme color",
   "@themeColor": {
     "description": "The settings entry label for custom theme color"
+  },
+  "manageStandardMaintenance": "Standard maintenance items",
+  "@manageStandardMaintenance": {
+    "description": "The title for the standard maintenance management screen"
+  },
+  "noStandardItems": "No standard maintenance items yet.",
+  "@noStandardItems": {
+    "description": "The label for the empty state of the standard maintenance list screen"
+  },
+  "deleteConfirmStandardItem": "Are you sure you want to delete the standard item \"{itemName}\"?",
+  "@deleteConfirmStandardItem": {
+    "description": "The body for the confirm delete dialog of standard maintenance items",
+    "placeholders": {
+      "itemName": {
+        "type": "String"
+      }
+    }
+  },
+  "addStandardItem": "Add standard item",
+  "@addStandardItem": {
+    "description": "The title for the add standard item screen"
+  },
+  "editStandardItem": "Edit standard item",
+  "@editStandardItem": {
+    "description": "The title for the edit standard item screen"
+  },
+  "manualEntry": "Manual entry",
+  "@manualEntry": {
+    "description": "The label for the manual entry option when adding maintenance item"
+  },
+  "importStandardTasks": "Import from standard",
+  "@importStandardTasks": {
+    "description": "The label for the import standard tasks option when adding maintenance item"
+  },
+  "importStandardTasksDesc": "Select tasks to add to {vehicleName}",
+  "@importStandardTasksDesc": {
+    "description": "The description for the import standard tasks screen",
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      }
+    }
+  },
+  "import": "Import",
+  "@import": {
+    "description": "The label for the import button"
+  },
+  "importSuccessCount": "{count, plural, =1{1 task} other{{count} tasks}} imported successfully",
+  "@importSuccessCount": {
+    "description": "The message shown after importing standard tasks",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

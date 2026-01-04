@@ -1035,6 +1035,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   )!.itemCount(_selectedReminderItemCount),
                   onTap: () => _showSelectReminderItemCountDialog(context),
                 ),
+                _buildSettingItem(
+                  icon: Icons.list_alt,
+                  label: AppLocalizations.of(context)!.manageStandardMaintenance,
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.standardMaintenanceListRoute,
+                    );
+                  },
+                ),
               ],
             ),
             _buildSettingsCard(

@@ -86,6 +86,68 @@ class _MaintenancePlanTabState extends State<MaintenancePlanTab> {
     }
   }
 
+  void _showAddOptions(
+    BuildContext context,
+    MaintenancePlanCubit maintenancePlanCubit,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext bottomSheetContext) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: Icon(
+                  Icons.edit_note,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                title: Text(AppLocalizations.of(context)!.manualEntry),
+                onTap: () {
+                  Navigator.pop(bottomSheetContext);
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.addManualItemRoute,
+                    arguments: {
+                      'vehicleId': widget.vehicleId,
+                      'vehicleName': widget.vehicleName,
+                      'planItem': null,
+                      'cubitInstance': maintenancePlanCubit,
+                      'serviceLogCubit': context.read<ServiceLogCubit>(),
+                    },
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.playlist_add_check_circle_outlined,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                title: Text(AppLocalizations.of(context)!.importStandardTasks),
+                onTap: () {
+                  Navigator.pop(bottomSheetContext);
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.importStandardItemRoute,
+                    arguments: {
+                      'vehicleId': widget.vehicleId,
+                      'vehicleName': widget.vehicleName,
+                      'cubitInstance': maintenancePlanCubit,
+                      'serviceLogCubit': context.read<ServiceLogCubit>(),
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   String _formatInterval(MaintenancePlanItem item) {
     final localeProvider = context.watch<LocaleProvider>();
     List<String> parts = [];
@@ -146,17 +208,7 @@ class _MaintenancePlanTabState extends State<MaintenancePlanTab> {
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.addManualItemRoute,
-                        arguments: {
-                          'vehicleId': widget.vehicleId,
-                          'vehicleName': widget.vehicleName,
-                          'planItem': null, // Adding new item
-                          'cubitInstance': maintenancePlanCubit,
-                          'serviceLogCubit': context.read<ServiceLogCubit>(),
-                        },
-                      );
+                      _showAddOptions(context, maintenancePlanCubit);
                     },
                     icon: Icon(
                       Icons.add,
