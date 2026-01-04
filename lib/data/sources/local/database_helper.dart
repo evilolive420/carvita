@@ -16,7 +16,7 @@ class DatabaseHelper {
 
   static Database? _database;
   static const String dbName = 'carvita_v1.db';
-  static const int _dbVersion = 3;
+  static const int _dbVersion = 4;
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -40,6 +40,9 @@ class DatabaseHelper {
     }
     if (oldVersion < 3) {
       await _seedExpandedStandardMaintenanceItems(db);
+    }
+    if (oldVersion < 4) {
+      await db.execute('ALTER TABLE vehicles ADD COLUMN model_year INTEGER');
     }
   }
 
@@ -222,7 +225,8 @@ class DatabaseHelper {
         model TEXT,
         plate_number TEXT,
         vin TEXT,
-        engine_number TEXT
+        engine_number TEXT,
+        model_year INTEGER
       )
     ''');
 

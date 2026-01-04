@@ -733,6 +733,14 @@
   "@vehicleModelHint": {
     "description": "The hint for the vehicle model field in the vehicle info screen"
   },
+  "modelYear": "Model year",
+  "@modelYear": {
+    "description": "The label for the model year field in the vehicle info screen"
+  },
+  "modelYearHint": "e.g. 2023",
+  "@modelYearHint": {
+    "description": "The hint for the model year field in the vehicle info screen"
+  },
   "vinHint": "Vehicle Identification Number",
   "@vinHint": {
     "description": "The hint for the VIN field in the vehicle info screen"
