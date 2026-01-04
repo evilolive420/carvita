@@ -13,6 +13,7 @@ class Vehicle extends Equatable {
   final String? plateNumber;
   final String? vin;
   final String? engineNumber;
+  final int? modelYear;
 
   const Vehicle({
     this.id,
@@ -25,6 +26,7 @@ class Vehicle extends Equatable {
     this.plateNumber,
     this.vin,
     this.engineNumber,
+    this.modelYear,
   });
 
   factory Vehicle.fromMap(Map<String, dynamic> map) {
@@ -39,6 +41,7 @@ class Vehicle extends Equatable {
       plateNumber: map['plate_number'] as String?,
       vin: map['vin'] as String?,
       engineNumber: map['engine_number'] as String?,
+      modelYear: map['model_year'] as int?,
     );
   }
 
@@ -54,6 +57,7 @@ class Vehicle extends Equatable {
       'plate_number': plateNumber,
       'vin': vin,
       'engine_number': engineNumber,
+      'model_year': modelYear,
     };
   }
 
@@ -68,6 +72,7 @@ class Vehicle extends Equatable {
     String? plateNumber,
     String? vin,
     String? engineNumber,
+    int? modelYear,
     bool clearImage = false, // Special flag to nullify image
   }) {
     return Vehicle(
@@ -81,6 +86,7 @@ class Vehicle extends Equatable {
       plateNumber: plateNumber ?? this.plateNumber,
       vin: vin ?? this.vin,
       engineNumber: engineNumber ?? this.engineNumber,
+      modelYear: modelYear ?? this.modelYear,
     );
   }
 
@@ -94,7 +100,8 @@ class Vehicle extends Equatable {
         model == other.model &&
         plateNumber == other.plateNumber &&
         vin == other.vin &&
-        engineNumber == other.engineNumber;
+        engineNumber == other.engineNumber &&
+        modelYear == other.modelYear;
   }
 
   @override
@@ -109,6 +116,7 @@ class Vehicle extends Equatable {
     plateNumber,
     vin,
     engineNumber,
+    modelYear,
   ];
 
   @override
