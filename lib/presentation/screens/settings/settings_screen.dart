@@ -966,7 +966,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         _triggerNotificationReschedule();
                       }
                     },
-                    activeColor: Theme.of(context).colorScheme.primary,
+                    activeThumbColor: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 _buildSettingItem(
@@ -1034,6 +1034,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     context,
                   )!.itemCount(_selectedReminderItemCount),
                   onTap: () => _showSelectReminderItemCountDialog(context),
+                ),
+                _buildSettingItem(
+                  icon: Icons.list_alt,
+                  label: AppLocalizations.of(context)!.manageStandardMaintenance,
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.standardMaintenanceListRoute,
+                    );
+                  },
                 ),
               ],
             ),

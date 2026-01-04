@@ -8,4 +8,7 @@ class AppRoutes {
   static const String upcomingMaintenanceRoute = '/upcoming-maintenance';
   static const String settingsRoute = '/settings';
   static const String privacyRoute = '/privacy';
+  static const String standardMaintenanceListRoute = '/standard-maintenance-list';
+  static const String addEditStandardItemRoute = '/add-edit-standard-item';
+  static const String importStandardItemRoute = '/import-standard-item';
 }

@@ -18,6 +18,7 @@ import 'package:carvita/data/repositories/vehicle_repository.dart';
 import 'package:carvita/data/sources/local/database_helper.dart';
 import 'package:carvita/i18n/generated/app_localizations.dart';
 import 'package:carvita/presentation/manager/locale_provider.dart';
+import 'package:carvita/presentation/manager/standard_maintenance/standard_maintenance_cubit.dart';
 import 'package:carvita/presentation/manager/theme_provider.dart';
 import 'package:carvita/presentation/manager/upcoming_maintenance/upcoming_maintenance_cubit.dart';
 import 'package:carvita/presentation/manager/vehicle_list/vehicle_cubit.dart';
@@ -123,6 +124,10 @@ class CarVitaApp extends StatelessWidget {
               )..loadAllUpcomingMaintenance(
                 AppLocalizations.of(context),
               ), // load on app start
+        ),
+        BlocProvider<StandardMaintenanceCubit>(
+          create:
+              (context) => StandardMaintenanceCubit(maintenanceRepository),
         ),
       ],
       child: Consumer2<LocaleProvider, ThemeProvider>(

@@ -6,6 +6,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:carvita/data/models/maintenance_plan_item.dart';
 import 'package:carvita/data/models/service_log_entry.dart';
 import 'package:carvita/data/models/service_log_performed_item_link.dart';
+import 'package:carvita/data/models/standard_maintenance_item.dart';
 import 'package:carvita/data/models/vehicle.dart';
 
 class DatabaseHelper {
@@ -15,7 +16,7 @@ class DatabaseHelper {
 
   static Database? _database;
   static const String dbName = 'carvita_v1.db';
-  static const int _dbVersion = 1;
+  static const int _dbVersion = 3;
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -29,8 +30,184 @@ class DatabaseHelper {
       path,
       version: _dbVersion,
       onCreate: _onCreate,
-      // onUpgrade: _onUpgrade,
+      onUpgrade: _onUpgrade,
     );
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await _createStandardMaintenanceItemsTable(db);
+    }
+    if (oldVersion < 3) {
+      await _seedExpandedStandardMaintenanceItems(db);
+    }
+  }
+
+  Future<void> _createStandardMaintenanceItemsTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE standard_maintenance_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        itemName TEXT NOT NULL,
+        intervalTimeMonths INTEGER,
+        intervalMileage INTEGER,
+        firstIntervalTimeMonths INTEGER,
+        firstIntervalMileage INTEGER,
+        notes TEXT
+      )
+    ''');
+  }
+
+  Future<void> _seedExpandedStandardMaintenanceItems(Database db) async {
+    final List<StandardMaintenanceItem> items = [
+      // ICE - Basic
+      StandardMaintenanceItem(
+        itemName: 'Oil Change (Conventional)',
+        intervalTimeMonths: 3,
+        intervalMileage: 3000,
+        notes: 'Recommended for severe driving conditions or older vehicles.',
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Oil Change (Synthetic)',
+        intervalTimeMonths: 6,
+        intervalMileage: 7500,
+        notes: 'Standard interval for modern vehicles using synthetic oil.',
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Tire Rotation',
+        intervalTimeMonths: 6,
+        intervalMileage: 5000,
+        notes:
+            'Rotate every oil change to ensure even wear. Crucial for EVs due to high torque.',
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Brake Inspection',
+        intervalTimeMonths: 12,
+        intervalMileage: 5000,
+      ),
+
+      // Filters
+      StandardMaintenanceItem(
+        itemName: 'Cabin Air Filter',
+        intervalTimeMonths: 12,
+        intervalMileage: 15000,
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Engine Air Filter',
+        intervalTimeMonths: 12,
+        intervalMileage: 15000,
+        notes: 'Inspect annually; replace if dirty or every 30,000 miles.',
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Fuel Filter Replacement',
+        intervalTimeMonths: 24,
+        intervalMileage: 30000,
+      ),
+
+      // Fluids
+      StandardMaintenanceItem(
+        itemName: 'Brake Fluid Flush',
+        intervalTimeMonths: 24,
+        intervalMileage: 30000,
+        notes: 'Hygroscopic fluid absorbs moisture. Flush every 2 years, especially in humid climates.',
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Coolant Flush',
+        intervalTimeMonths: 60, // 5 years
+        intervalMileage: 60000,
+        notes: 'Intervals vary by manufacturer (60k-100k miles).',
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Transmission Fluid Replacement',
+        intervalTimeMonths: 48,
+        intervalMileage: 60000,
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Power Steering Fluid Flush',
+        intervalMileage: 180000,
+      ),
+
+      // Long term / Wear items
+      StandardMaintenanceItem(
+        itemName: 'Spark Plugs (Standard)',
+        intervalTimeMonths: 48,
+        intervalMileage: 60000,
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Spark Plugs (Iridium/Platinum)',
+        intervalMileage: 100000,
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Drive Belt Inspection',
+        intervalTimeMonths: 48,
+        intervalMileage: 60000,
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Timing Belt Replacement',
+        intervalTimeMonths: 72, // 6 years
+        intervalMileage: 90000,
+        notes: 'Critical for interference engines. Failure causes engine damage.',
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Shocks and Struts',
+        intervalMileage: 125000,
+      ),
+
+      // Hybrid
+      StandardMaintenanceItem(
+        itemName: 'Hybrid Battery Fan Filter Cleaning',
+        intervalMileage: 20000,
+        notes: 'Clean filter to prevent battery overheating. Visual check every 10k.',
+      ),
+
+      // EV
+      StandardMaintenanceItem(
+        itemName: 'EV Brake Caliper Lubrication',
+        intervalTimeMonths: 12,
+        intervalMileage: 12500,
+        notes: 'Essential in salted/humid areas to prevent seizing due to regenerative braking use.',
+      ),
+      StandardMaintenanceItem(
+        itemName: 'EV Coolant Flush',
+        intervalMileage: 75000,
+        notes: 'Low-conductivity coolant maintenance is vital for battery safety.',
+      ),
+
+      // General
+      StandardMaintenanceItem(
+        itemName: '12V Battery Replacement',
+        intervalTimeMonths: 36, // 3 years
+        notes: 'Replace every 3-5 years. In high heat (e.g., Florida), expect 3 years.',
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Suspension & Steering Inspection',
+        intervalTimeMonths: 12,
+        intervalMileage: 15000,
+      ),
+      StandardMaintenanceItem(
+        itemName: 'Undercarriage Wash & Rust Inspection',
+        intervalTimeMonths: 12,
+        notes: 'Crucial for vehicles in coastal areas or salted roads.',
+      ),
+    ];
+
+    for (var item in items) {
+      // Check if item already exists by name to avoid duplicates during upgrade
+      final List<Map<String, dynamic>> existing = await db.query(
+        'standard_maintenance_items',
+        where: 'itemName = ?',
+        whereArgs: [item.itemName],
+      );
+
+      if (existing.isEmpty) {
+        Map<String, dynamic> itemMap = item.toMap();
+        itemMap.remove('id');
+        await db.insert(
+          'standard_maintenance_items',
+          itemMap,
+          conflictAlgorithm: ConflictAlgorithm.ignore,
+        );
+      }
+    }
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -86,6 +263,9 @@ class DatabaseHelper {
         FOREIGN KEY (maintenancePlanItemId) REFERENCES maintenance_plan_items (id) ON DELETE SET NULL 
       )
     ''');
+
+    await _createStandardMaintenanceItemsTable(db);
+    await _seedExpandedStandardMaintenanceItems(db);
   }
 
   // --- vehicle CRUD ---
@@ -383,6 +563,68 @@ class DatabaseHelper {
           ),
         )
         .toList();
+  }
+
+  // --- Standard Maintenance Item CRUD ---
+
+  Future<List<StandardMaintenanceItem>> getAllStandardMaintenanceItems() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'standard_maintenance_items',
+      orderBy: 'itemName ASC',
+    );
+    if (maps.isEmpty) {
+      return [];
+    }
+    return List.generate(
+      maps.length,
+      (i) => StandardMaintenanceItem.fromMap(maps[i]),
+    );
+  }
+
+  Future<StandardMaintenanceItem?> getStandardMaintenanceItemById(
+    int id,
+  ) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'standard_maintenance_items',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (maps.isNotEmpty) {
+      return StandardMaintenanceItem.fromMap(maps.first);
+    }
+    return null;
+  }
+
+  Future<int> insertStandardMaintenanceItem(StandardMaintenanceItem item) async {
+    final db = await database;
+    Map<String, dynamic> itemMap = item.toMap();
+    itemMap.remove('id');
+    return await db.insert(
+      'standard_maintenance_items',
+      itemMap,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<int> updateStandardMaintenanceItem(StandardMaintenanceItem item) async {
+    final db = await database;
+    return await db.update(
+      'standard_maintenance_items',
+      item.toMap(),
+      where: 'id = ?',
+      whereArgs: [item.id],
+    );
+  }
+
+  Future<int> deleteStandardMaintenanceItem(int id) async {
+    final db = await database;
+    return await db.delete(
+      'standard_maintenance_items',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   Future<void> close() async {

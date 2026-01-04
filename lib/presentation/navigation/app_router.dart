@@ -17,6 +17,10 @@ import 'package:carvita/presentation/screens/settings/settings_screen.dart';
 import 'package:carvita/presentation/screens/vehicle/add_edit_vehicle_screen.dart';
 import 'package:carvita/presentation/screens/vehicle/vehicle_details_screen.dart';
 import 'package:carvita/presentation/screens/vehicle/vehicle_list_screen.dart';
+import 'package:carvita/presentation/screens/settings/standard_maintenance_list_screen.dart';
+import 'package:carvita/presentation/screens/settings/add_edit_standard_maintenance_item_screen.dart';
+import 'package:carvita/presentation/screens/maintenance/import_standard_maintenance_screen.dart';
+import 'package:carvita/data/models/standard_maintenance_item.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -107,6 +111,47 @@ class AppRouter {
           );
         }
         return _errorRoute("Missing arguments for LogMaintenanceScreen");
+      case AppRoutes.standardMaintenanceListRoute:
+        return MaterialPageRoute(
+          builder: (_) => const StandardMaintenanceListScreen(),
+        );
+      case AppRoutes.addEditStandardItemRoute:
+        final StandardMaintenanceItem? itemToEdit =
+            settings.arguments as StandardMaintenanceItem?;
+        return MaterialPageRoute(
+          builder:
+              (_) => AddEditStandardMaintenanceItemScreen(
+                itemToEdit: itemToEdit,
+              ),
+        );
+      case AppRoutes.importStandardItemRoute:
+        final arguments = settings.arguments as Map<String, dynamic>?;
+        final int? vehicleId = arguments?['vehicleId'] as int?;
+        final String? vehicleName = arguments?['vehicleName'] as String?;
+        final MaintenancePlanCubit? cubitInstance =
+            arguments?['cubitInstance'] as MaintenancePlanCubit?;
+        final ServiceLogCubit? serviceLogCubit =
+            arguments?['serviceLogCubit'] as ServiceLogCubit?;
+
+        if (vehicleId != null &&
+            vehicleName != null &&
+            cubitInstance != null &&
+            serviceLogCubit != null) {
+          return MaterialPageRoute(
+            builder:
+                (_) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider.value(value: cubitInstance),
+                    BlocProvider.value(value: serviceLogCubit),
+                  ],
+                  child: ImportStandardMaintenanceScreen(
+                    vehicleId: vehicleId,
+                    vehicleName: vehicleName,
+                  ),
+                ),
+          );
+        }
+        return _errorRoute("Missing arguments for ImportStandardItemRoute");
       default:
         return _errorRoute("No route defined for ${settings.name}");
     }
