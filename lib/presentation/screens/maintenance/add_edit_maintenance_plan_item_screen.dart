@@ -7,12 +7,14 @@ import 'package:carvita/core/constants/app_colors.dart';
 import 'package:carvita/core/theme/app_theme.dart';
 import 'package:carvita/core/widgets/gradient_background.dart';
 import 'package:carvita/data/models/maintenance_plan_item.dart';
+import 'package:carvita/data/models/maintenance_supply.dart';
 import 'package:carvita/i18n/generated/app_localizations.dart';
 import 'package:carvita/presentation/manager/locale_provider.dart';
 import 'package:carvita/presentation/manager/maintenance_plan/maintenance_plan_cubit.dart';
 import 'package:carvita/presentation/manager/maintenance_plan/maintenance_plan_state.dart';
 import 'package:carvita/presentation/manager/service_log/service_log_cubit.dart';
 import 'package:carvita/presentation/manager/upcoming_maintenance/upcoming_maintenance_cubit.dart';
+import 'package:carvita/presentation/screens/maintenance/widgets/maintenance_supply_list_editor.dart';
 
 class AddEditMaintenancePlanItemScreen extends StatefulWidget {
   final int vehicleId;
@@ -42,6 +44,8 @@ class _AddEditMaintenancePlanItemScreenState
   late TextEditingController _firstIntervalMileageController;
   late TextEditingController _notesController;
 
+  List<MaintenanceSupply> _supplies = [];
+
   bool get _isEditing => widget.planItemToEdit != null;
   String get _vehicleName => widget.vehicleName;
 
@@ -63,6 +67,20 @@ class _AddEditMaintenancePlanItemScreenState
       text: item?.firstIntervalMileage?.toString() ?? '',
     );
     _notesController = TextEditingController(text: item?.notes ?? '');
+
+    if (_isEditing && item != null && item.id != null) {
+      _loadSupplies(item.id!);
+    }
+  }
+
+  Future<void> _loadSupplies(int itemId) async {
+    final cubit = context.read<MaintenancePlanCubit>();
+    final supplies = await cubit.getSupplies(itemId);
+    if (mounted) {
+      setState(() {
+        _supplies = supplies;
+      });
+    }
   }
 
   @override
@@ -196,10 +214,18 @@ class _AddEditMaintenancePlanItemScreenState
       );
 
       final cubit = context.read<MaintenancePlanCubit>();
+      int? itemId;
+
       if (_isEditing) {
         await cubit.updatePlanItem(planItem);
+        itemId = planItem.id;
       } else {
-        await cubit.addPlanItem(planItem);
+        itemId = await cubit.addPlanItem(planItem);
+      }
+
+      // Save supplies
+      if (itemId != null) {
+        await cubit.saveSupplies(itemId, _supplies);
       }
 
       if (mounted &&
@@ -356,6 +382,13 @@ class _AddEditMaintenancePlanItemScreenState
                   mileageHint: AppLocalizations.of(
                     context,
                   )!.mileageHint(localeProvider.mileageUnit),
+                ),
+                const SizedBox(height: 20),
+                MaintenanceSupplyListEditor(
+                    initialSupplies: _supplies,
+                    onSuppliesChanged: (newSupplies) {
+                        _supplies = newSupplies;
+                    },
                 ),
                 const SizedBox(height: 20),
                 TextFormField(

@@ -1,4 +1,5 @@
 import 'package:carvita/data/models/maintenance_plan_item.dart';
+import 'package:carvita/data/models/maintenance_supply.dart';
 import 'package:carvita/data/models/service_log_entry.dart';
 import 'package:carvita/data/models/service_log_performed_item_link.dart';
 import 'package:carvita/data/models/standard_maintenance_item.dart';
@@ -15,8 +16,8 @@ class MaintenanceRepository {
     return await _dbHelper.getMaintenancePlanItemsForVehicle(vehicleId);
   }
 
-  Future<void> addPlanItem(MaintenancePlanItem item) async {
-    await _dbHelper.insertMaintenancePlanItem(item.copyWith(isActive: true));
+  Future<int> addPlanItem(MaintenancePlanItem item) async {
+    return await _dbHelper.insertMaintenancePlanItem(item.copyWith(isActive: true));
   }
 
   Future<void> updatePlanItem(MaintenancePlanItem item) async {
@@ -25,6 +26,16 @@ class MaintenanceRepository {
 
   Future<void> deletePlanItem(int itemId) async {
     await _dbHelper.softDeleteMaintenancePlanItem(itemId); // soft delete
+  }
+
+  // --- Maintenance Supply Methods ---
+
+  Future<List<MaintenanceSupply>> getSupplies(int itemId) async {
+    return await _dbHelper.getSuppliesForPlanItem(itemId);
+  }
+
+  Future<void> saveSupplies(int itemId, List<MaintenanceSupply> supplies) async {
+    await _dbHelper.updateSuppliesForPlanItem(itemId, supplies);
   }
 
   // --- Service Log Methods ---
