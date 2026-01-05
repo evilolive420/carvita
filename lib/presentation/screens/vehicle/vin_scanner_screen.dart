@@ -33,13 +33,17 @@ class _VinScannerScreenState extends State<VinScannerScreen> {
           IconButton(
             color: Colors.white,
             icon: ValueListenableBuilder(
-              valueListenable: controller.torchState,
+              valueListenable: controller,
               builder: (context, state, child) {
-                switch (state) {
+                switch (state.torchState) {
                   case TorchState.off:
                     return const Icon(Icons.flash_off, color: Colors.grey);
                   case TorchState.on:
                     return const Icon(Icons.flash_on, color: Colors.yellow);
+                  case TorchState.auto: // Handle auto if needed, or default to off icon
+                     return const Icon(Icons.flash_auto, color: Colors.white);
+                  case TorchState.unavailable:
+                     return const Icon(Icons.no_flash, color: Colors.grey);
                 }
               },
             ),
@@ -49,12 +53,12 @@ class _VinScannerScreenState extends State<VinScannerScreen> {
           IconButton(
             color: Colors.white,
             icon: ValueListenableBuilder(
-              valueListenable: controller.cameraFacingState,
+              valueListenable: controller,
               builder: (context, state, child) {
-                switch (state) {
-                  case CameraFacing.front:
+                switch (state.cameraDirection) {
+                  case CameraDirection.front:
                     return const Icon(Icons.camera_front);
-                  case CameraFacing.back:
+                  case CameraDirection.back:
                     return const Icon(Icons.camera_rear);
                 }
               },
