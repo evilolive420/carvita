@@ -733,14 +733,6 @@
   "@vehicleModelHint": {
     "description": "The hint for the vehicle model field in the vehicle info screen"
   },
-  "modelYear": "Model year",
-  "@modelYear": {
-    "description": "The label for the model year field in the vehicle info screen"
-  },
-  "modelYearHint": "e.g. 2023",
-  "@modelYearHint": {
-    "description": "The hint for the model year field in the vehicle info screen"
-  },
   "vinHint": "Vehicle Identification Number",
   "@vinHint": {
     "description": "The hint for the VIN field in the vehicle info screen"
@@ -905,5 +897,49 @@
         "type": "int"
       }
     }
+  },
+  "supplies": "Supplies (Parts & Fluids)",
+  "@supplies": {
+    "description": "Title for the supplies section"
+  },
+  "addSupply": "Add supply",
+  "@addSupply": {
+    "description": "Button label to add a supply"
+  },
+  "supplyType": "Type",
+  "@supplyType": {
+    "description": "Label for supply type (Part or Fluid)"
+  },
+  "supplyTypePart": "Part",
+  "@supplyTypePart": {
+    "description": "Option for supply type Part"
+  },
+  "supplyTypeFluid": "Fluid",
+  "@supplyTypeFluid": {
+    "description": "Option for supply type Fluid"
+  },
+  "supplyMaker": "Maker",
+  "@supplyMaker": {
+    "description": "Label for supply maker"
+  },
+  "supplyMakerHint": "e.g. ACDelco, Mobil1",
+  "@supplyMakerHint": {
+    "description": "Hint for supply maker"
+  },
+  "supplyCode": "Code / Spec",
+  "@supplyCode": {
+    "description": "Label for supply code or specification"
+  },
+  "supplyCodeHint": "e.g. PF48E, 5w30",
+  "@supplyCodeHint": {
+    "description": "Hint for supply code"
+  },
+  "supplyQuantity": "Quantity",
+  "@supplyQuantity": {
+    "description": "Label for supply quantity"
+  },
+  "supplyQuantityHint": "e.g. 5 qt, 1 pc",
+  "@supplyQuantityHint": {
+    "description": "Hint for supply quantity"
   }
 }

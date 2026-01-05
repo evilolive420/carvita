@@ -4,6 +4,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'package:carvita/data/models/maintenance_plan_item.dart';
+import 'package:carvita/data/models/maintenance_supply.dart';
 import 'package:carvita/data/models/service_log_entry.dart';
 import 'package:carvita/data/models/service_log_performed_item_link.dart';
 import 'package:carvita/data/models/standard_maintenance_item.dart';
@@ -42,8 +43,23 @@ class DatabaseHelper {
       await _seedExpandedStandardMaintenanceItems(db);
     }
     if (oldVersion < 4) {
-      await db.execute('ALTER TABLE vehicles ADD COLUMN model_year INTEGER');
+      await _createMaintenanceSuppliesTable(db);
     }
+  }
+
+  Future<void> _createMaintenanceSuppliesTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE maintenance_supplies (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        maintenancePlanItemId INTEGER NOT NULL,
+        type TEXT NOT NULL,
+        maker TEXT NOT NULL,
+        code TEXT NOT NULL,
+        quantity TEXT,
+        notes TEXT,
+        FOREIGN KEY (maintenancePlanItemId) REFERENCES maintenance_plan_items (id) ON DELETE CASCADE
+      )
+    ''');
   }
 
   Future<void> _createStandardMaintenanceItemsTable(Database db) async {
@@ -225,8 +241,7 @@ class DatabaseHelper {
         model TEXT,
         plate_number TEXT,
         vin TEXT,
-        engine_number TEXT,
-        model_year INTEGER
+        engine_number TEXT
       )
     ''');
 
@@ -270,6 +285,7 @@ class DatabaseHelper {
 
     await _createStandardMaintenanceItemsTable(db);
     await _seedExpandedStandardMaintenanceItems(db);
+    await _createMaintenanceSuppliesTable(db);
   }
 
   // --- vehicle CRUD ---
@@ -384,6 +400,42 @@ class DatabaseHelper {
       where: 'id = ?',
       whereArgs: [itemId],
     );
+  }
+
+  // --- Maintenance Supplies CRUD ---
+
+  Future<List<MaintenanceSupply>> getSuppliesForPlanItem(int itemId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'maintenance_supplies',
+      where: 'maintenancePlanItemId = ?',
+      whereArgs: [itemId],
+    );
+    return List.generate(maps.length, (i) => MaintenanceSupply.fromMap(maps[i]));
+  }
+
+  Future<void> updateSuppliesForPlanItem(
+    int itemId,
+    List<MaintenanceSupply> supplies,
+  ) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      // Delete existing supplies for this item
+      await txn.delete(
+        'maintenance_supplies',
+        where: 'maintenancePlanItemId = ?',
+        whereArgs: [itemId],
+      );
+
+      // Insert new supplies
+      for (var supply in supplies) {
+        Map<String, dynamic> supplyMap = supply.toMap();
+        supplyMap.remove('id'); // let auto-increment work
+        // Ensure the foreign key is correct
+        supplyMap['maintenancePlanItemId'] = itemId;
+        await txn.insert('maintenance_supplies', supplyMap);
+      }
+    });
   }
 
   // --- Maintenance log CRUD ---

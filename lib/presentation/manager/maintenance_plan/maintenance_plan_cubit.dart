@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:carvita/data/models/maintenance_plan_item.dart';
+import 'package:carvita/data/models/maintenance_supply.dart';
 import 'package:carvita/data/repositories/maintenance_repository.dart';
 import 'maintenance_plan_state.dart';
 
@@ -23,17 +24,19 @@ class MaintenancePlanCubit extends Cubit<MaintenancePlanState> {
     }
   }
 
-  Future<void> addPlanItem(MaintenancePlanItem item) async {
+  Future<int?> addPlanItem(MaintenancePlanItem item) async {
     try {
       if (item.vehicleId != vehicleId) {
         emit(MaintenancePlanError("Vehicle does not match maintenance plan"));
-        return;
+        return null;
       }
-      await _repository.addPlanItem(item);
+      final id = await _repository.addPlanItem(item);
       fetchPlanItems();
       emit(MaintenancePlanOperationSuccess(""));
+      return id;
     } catch (e) {
       emit(MaintenancePlanError(e.toString()));
+      return null;
     }
   }
 
@@ -59,5 +62,13 @@ class MaintenancePlanCubit extends Cubit<MaintenancePlanState> {
     } catch (e) {
       emit(MaintenancePlanError(e.toString()));
     }
+  }
+
+  Future<List<MaintenanceSupply>> getSupplies(int itemId) async {
+    return await _repository.getSupplies(itemId);
+  }
+
+  Future<void> saveSupplies(int itemId, List<MaintenanceSupply> supplies) async {
+    await _repository.saveSupplies(itemId, supplies);
   }
 }
