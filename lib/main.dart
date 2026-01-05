@@ -1,9 +1,13 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'package:carvita/core/constants/app_colors.dart';
 import 'package:carvita/core/constants/app_routes.dart';
@@ -49,9 +53,17 @@ final appSupportedLocales = [
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
+
   final notificationService = NotificationService();
-  await notificationService.initialize();
-  await notificationService.requestPermissions();
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS || Platform.isMacOS || Platform.isLinux)) {
+    await notificationService.initialize();
+    await notificationService.requestPermissions();
+  }
   await findSystemLocale();
   final preferencesService = PreferencesService();
   final databaseHelper = DatabaseHelper();
@@ -64,7 +76,9 @@ Future<void> main() async {
     maintenanceRepository: maintenanceRepository,
     preferencesService: preferencesService,
   );
-  quickActionService.initializeListener();
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+    quickActionService.initializeListener();
+  }
   runApp(
     MultiProvider(
       providers: [
@@ -247,7 +261,9 @@ class _ShortcutLocalizationWrapperState
 
   void _updateShortcuts() {
     if (mounted) {
-      context.read<QuickActionService>().updateShortcutItems(context);
+      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+        context.read<QuickActionService>().updateShortcutItems(context);
+      }
     }
   }
 
