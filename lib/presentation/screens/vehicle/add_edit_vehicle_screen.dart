@@ -235,7 +235,7 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.vinDecodeError),
+            content: Text('${AppLocalizations.of(context)!.vinDecodeError}: $e'),
             backgroundColor: AppColors.urgentReminderText,
           ),
         );
