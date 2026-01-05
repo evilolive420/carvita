@@ -230,6 +230,9 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                                 if (vehicle.model != null &&
                                     vehicle.model!.isNotEmpty)
                                   vehicle.model,
+                                if (vehicle.trim != null &&
+                                    vehicle.trim!.isNotEmpty)
+                                  vehicle.trim,
                                 if (vehicle.modelYear != null)
                                   '(${vehicle.modelYear})',
                               ].join(" ")

@@ -17,6 +17,8 @@ class NhtsaApiService {
         String? make;
         String? model;
         String? year;
+        String? trim;
+        String? series;
         String? engineModel;
         String? displacementL;
         String? cylinders;
@@ -37,6 +39,12 @@ class NhtsaApiService {
               break;
             case 'Model Year':
               year = value;
+              break;
+            case 'Trim':
+              trim = value;
+              break;
+            case 'Series':
+              series = value;
               break;
             case 'Engine Model':
               engineModel = value;
@@ -81,6 +89,8 @@ class NhtsaApiService {
           'make': make,
           'model': model,
           'year': year,
+          'trim': trim,
+          'series': series,
           'engine': engineDescription,
         };
       } else {

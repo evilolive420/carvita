@@ -11,6 +11,7 @@ class Vehicle extends Equatable {
   final Uint8List? image;
   final String? make;
   final String? model;
+  final String? trim;
   final int? modelYear;
   final String? plateNumber;
   final String? vin;
@@ -25,6 +26,7 @@ class Vehicle extends Equatable {
     this.image,
     this.make,
     this.model,
+    this.trim,
     this.modelYear,
     this.plateNumber,
     this.vin,
@@ -41,6 +43,7 @@ class Vehicle extends Equatable {
       image: map['image'] as Uint8List?,
       make: map['make'] as String?,
       model: map['model'] as String?,
+      trim: map['trim'] as String?,
       modelYear: map['model_year'] as int?,
       plateNumber: map['plate_number'] as String?,
       vin: map['vin'] as String?,
@@ -58,6 +61,7 @@ class Vehicle extends Equatable {
       'image': image,
       'make': make,
       'model': model,
+      'trim': trim,
       'model_year': modelYear,
       'plate_number': plateNumber,
       'vin': vin,
@@ -74,6 +78,7 @@ class Vehicle extends Equatable {
     Uint8List? image,
     String? make,
     String? model,
+    String? trim,
     int? modelYear,
     String? plateNumber,
     String? vin,
@@ -89,6 +94,7 @@ class Vehicle extends Equatable {
       image: clearImage ? null : (image ?? this.image),
       make: make ?? this.make,
       model: model ?? this.model,
+      trim: trim ?? this.trim,
       modelYear: modelYear ?? this.modelYear,
       plateNumber: plateNumber ?? this.plateNumber,
       vin: vin ?? this.vin,
@@ -105,6 +111,7 @@ class Vehicle extends Equatable {
         image == other.image &&
         make == other.make &&
         model == other.model &&
+        trim == other.trim &&
         modelYear == other.modelYear &&
         plateNumber == other.plateNumber &&
         vin == other.vin &&
@@ -121,6 +128,7 @@ class Vehicle extends Equatable {
     image,
     make,
     model,
+    trim,
     modelYear,
     plateNumber,
     vin,

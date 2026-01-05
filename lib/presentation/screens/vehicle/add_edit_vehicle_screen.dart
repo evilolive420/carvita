@@ -35,6 +35,7 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
   late TextEditingController _boughtDateController;
   late TextEditingController _makeController;
   late TextEditingController _modelController;
+  late TextEditingController _trimController;
   late TextEditingController _modelYearController;
   late TextEditingController _plateNumberController;
   late TextEditingController _vinController;
@@ -61,6 +62,7 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
     );
     _makeController = TextEditingController(text: v?.make ?? '');
     _modelController = TextEditingController(text: v?.model ?? '');
+    _trimController = TextEditingController(text: v?.trim ?? '');
     _modelYearController = TextEditingController(
       text: v?.modelYear?.toString() ?? '',
     );
@@ -79,6 +81,7 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
     _boughtDateController.dispose();
     _makeController.dispose();
     _modelController.dispose();
+    _trimController.dispose();
     _modelYearController.dispose();
     _plateNumberController.dispose();
     _vinController.dispose();
@@ -198,19 +201,13 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
           setState(() {
             _vinController.text = scannedVin;
           });
-          // Optional: Auto-trigger decode?
-          // User requested "just fill the text field", so we stop here.
         }
       }
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.errNotificationPermission), // Reusing permission error or add new one?
-            // Better to generic error or request explicitly.
-            // "Camera permission is required to scan VIN"
-            // For now using a simple text since I didn't add a specific key in arb yet, or reuse generic.
-            // Actually, I should probably add a key or just show a text for now.
+            content: Text(AppLocalizations.of(context)!.errNotificationPermission),
              backgroundColor: AppColors.urgentReminderText,
           ),
         );
@@ -249,6 +246,9 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
         if (result['model'] != null) {
           _modelController.text = result['model']!;
         }
+        if (result['trim'] != null && result['trim']!.isNotEmpty) {
+          _trimController.text = result['trim']!;
+        }
         if (result['year'] != null) {
           _modelYearController.text = result['year']!;
         }
@@ -256,6 +256,34 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
           _engineNumberController.text = result['engine']!;
         }
       });
+
+      // Handle Series fallback if Trim is missing
+      if (mounted && (result['trim'] == null || result['trim']!.isEmpty) && (result['series'] != null && result['series']!.isNotEmpty)) {
+          final useSeries = await showDialog<bool>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+              title: Text(AppLocalizations.of(context)!.useSeriesAsTrimTitle),
+              content: Text(AppLocalizations.of(context)!.useSeriesAsTrimBody(result['series']!)),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(false),
+                  child: Text(AppLocalizations.of(context)!.no),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(true),
+                  child: Text(AppLocalizations.of(context)!.yes),
+                ),
+              ],
+            ),
+          );
+
+          if (useSeries == true) {
+             setState(() {
+               _trimController.text = result['series']!;
+             });
+          }
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -323,6 +351,10 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
         model:
             _modelController.text.trim().isNotEmpty
                 ? _modelController.text.trim()
+                : null,
+        trim:
+            _trimController.text.trim().isNotEmpty
+                ? _trimController.text.trim()
                 : null,
         modelYear: int.tryParse(_modelYearController.text.trim()),
         plateNumber:
@@ -577,6 +609,11 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
                     _modelController,
                     AppLocalizations.of(context)!.vehicleModel,
                     AppLocalizations.of(context)!.vehicleModelHint,
+                  ),
+                  formField(
+                    _trimController,
+                    AppLocalizations.of(context)!.vehicleTrim,
+                    AppLocalizations.of(context)!.vehicleTrimHint,
                   ),
                   formField(
                     _modelYearController,

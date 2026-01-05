@@ -741,6 +741,27 @@
   "@vehicleMakeHint": {
     "description": "The hint for the vehicle make field in the vehicle info screen"
   },
+  "vehicleTrim": "Trim",
+  "@vehicleTrim": {
+    "description": "The label for the vehicle trim field"
+  },
+  "vehicleTrimHint": "e.g. ZL1",
+  "@vehicleTrimHint": {
+    "description": "The hint for the vehicle trim field"
+  },
+  "useSeriesAsTrimTitle": "Trim not found",
+  "@useSeriesAsTrimTitle": {
+    "description": "Title for the dialog asking to use series as trim"
+  },
+  "useSeriesAsTrimBody": "Trim was not found in the decoded data. Do you want to use the Series \"{series}\" instead?",
+  "@useSeriesAsTrimBody": {
+    "description": "Body for the dialog asking to use series as trim",
+    "placeholders": {
+      "series": {
+        "type": "String"
+      }
+    }
+  },
   "vehicleYear": "Model year",
   "@vehicleYear": {
     "description": "The label for the vehicle model year field in the vehicle info screen"
