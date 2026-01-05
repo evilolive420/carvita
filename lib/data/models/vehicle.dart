@@ -9,7 +9,9 @@ class Vehicle extends Equatable {
   final DateTime mileageLastUpdated;
   final DateTime boughtDate;
   final Uint8List? image;
+  final String? make;
   final String? model;
+  final int? modelYear;
   final String? plateNumber;
   final String? vin;
   final String? engineNumber;
@@ -21,7 +23,9 @@ class Vehicle extends Equatable {
     required this.mileageLastUpdated,
     required this.boughtDate,
     this.image,
+    this.make,
     this.model,
+    this.modelYear,
     this.plateNumber,
     this.vin,
     this.engineNumber,
@@ -35,7 +39,9 @@ class Vehicle extends Equatable {
       mileageLastUpdated: DateTime.parse(map['mileage_last_updated'] as String),
       boughtDate: DateTime.parse(map['bought_date'] as String),
       image: map['image'] as Uint8List?,
+      make: map['make'] as String?,
       model: map['model'] as String?,
+      modelYear: map['model_year'] as int?,
       plateNumber: map['plate_number'] as String?,
       vin: map['vin'] as String?,
       engineNumber: map['engine_number'] as String?,
@@ -50,7 +56,9 @@ class Vehicle extends Equatable {
       'mileage_last_updated': mileageLastUpdated.toIso8601String(),
       'bought_date': boughtDate.toIso8601String(),
       'image': image,
+      'make': make,
       'model': model,
+      'model_year': modelYear,
       'plate_number': plateNumber,
       'vin': vin,
       'engine_number': engineNumber,
@@ -64,7 +72,9 @@ class Vehicle extends Equatable {
     DateTime? mileageLastUpdated,
     DateTime? boughtDate,
     Uint8List? image,
+    String? make,
     String? model,
+    int? modelYear,
     String? plateNumber,
     String? vin,
     String? engineNumber,
@@ -77,7 +87,9 @@ class Vehicle extends Equatable {
       mileageLastUpdated: mileageLastUpdated ?? this.mileageLastUpdated,
       boughtDate: boughtDate ?? this.boughtDate,
       image: clearImage ? null : (image ?? this.image),
+      make: make ?? this.make,
       model: model ?? this.model,
+      modelYear: modelYear ?? this.modelYear,
       plateNumber: plateNumber ?? this.plateNumber,
       vin: vin ?? this.vin,
       engineNumber: engineNumber ?? this.engineNumber,
@@ -91,7 +103,9 @@ class Vehicle extends Equatable {
         mileageLastUpdated == other.mileageLastUpdated &&
         boughtDate == other.boughtDate &&
         image == other.image &&
+        make == other.make &&
         model == other.model &&
+        modelYear == other.modelYear &&
         plateNumber == other.plateNumber &&
         vin == other.vin &&
         engineNumber == other.engineNumber;
@@ -105,7 +119,9 @@ class Vehicle extends Equatable {
     mileageLastUpdated,
     boughtDate,
     image,
+    make,
     model,
+    modelYear,
     plateNumber,
     vin,
     engineNumber,

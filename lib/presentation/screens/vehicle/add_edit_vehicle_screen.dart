@@ -30,7 +30,9 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
   late TextEditingController _nameController;
   late TextEditingController _mileageController;
   late TextEditingController _boughtDateController;
+  late TextEditingController _makeController;
   late TextEditingController _modelController;
+  late TextEditingController _modelYearController;
   late TextEditingController _plateNumberController;
   late TextEditingController _vinController;
   late TextEditingController _engineNumberController;
@@ -52,7 +54,11 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
     _boughtDateController = TextEditingController(
       text: v != null ? DateFormat.yMMMd().format(v.boughtDate) : '',
     );
+    _makeController = TextEditingController(text: v?.make ?? '');
     _modelController = TextEditingController(text: v?.model ?? '');
+    _modelYearController = TextEditingController(
+      text: v?.modelYear?.toString() ?? '',
+    );
     _plateNumberController = TextEditingController(text: v?.plateNumber ?? '');
     _vinController = TextEditingController(text: v?.vin ?? '');
     _engineNumberController = TextEditingController(
@@ -66,7 +72,9 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
     _nameController.dispose();
     _mileageController.dispose();
     _boughtDateController.dispose();
+    _makeController.dispose();
     _modelController.dispose();
+    _modelYearController.dispose();
     _plateNumberController.dispose();
     _vinController.dispose();
     _engineNumberController.dispose();
@@ -206,10 +214,15 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
         mileageLastUpdated: mileageLastUpdated,
         boughtDate: _selectedBoughtDate!,
         image: _selectedImageBytes,
+        make:
+            _makeController.text.trim().isNotEmpty
+                ? _makeController.text.trim()
+                : null,
         model:
             _modelController.text.trim().isNotEmpty
                 ? _modelController.text.trim()
                 : null,
+        modelYear: int.tryParse(_modelYearController.text.trim()),
         plateNumber:
             _plateNumberController.text.trim().isNotEmpty
                 ? _plateNumberController.text.trim()
@@ -399,9 +412,20 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
                   ),
                 ),
                 formField(
+                  _makeController,
+                  AppLocalizations.of(context)!.vehicleMake,
+                  AppLocalizations.of(context)!.vehicleMakeHint,
+                ),
+                formField(
                   _modelController,
                   AppLocalizations.of(context)!.vehicleModel,
                   AppLocalizations.of(context)!.vehicleModelHint,
+                ),
+                formField(
+                  _modelYearController,
+                  AppLocalizations.of(context)!.vehicleYear,
+                  AppLocalizations.of(context)!.vehicleYearHint,
+                  keyboardType: TextInputType.number,
                 ),
                 formField(
                   _plateNumberController,

@@ -733,6 +733,22 @@
   "@vehicleModelHint": {
     "description": "The hint for the vehicle model field in the vehicle info screen"
   },
+  "vehicleMake": "Make",
+  "@vehicleMake": {
+    "description": "The label for the vehicle make field in the vehicle info screen"
+  },
+  "vehicleMakeHint": "e.g. Tesla",
+  "@vehicleMakeHint": {
+    "description": "The hint for the vehicle make field in the vehicle info screen"
+  },
+  "vehicleYear": "Model year",
+  "@vehicleYear": {
+    "description": "The label for the vehicle model year field in the vehicle info screen"
+  },
+  "vehicleYearHint": "e.g. 2024",
+  "@vehicleYearHint": {
+    "description": "The hint for the vehicle model year field in the vehicle info screen"
+  },
   "vinHint": "Vehicle Identification Number",
   "@vinHint": {
     "description": "The hint for the VIN field in the vehicle info screen"

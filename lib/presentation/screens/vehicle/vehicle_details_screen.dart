@@ -169,7 +169,13 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen>
           ),
           const SizedBox(height: 5),
           Text(
-            "${vehicle.model != null ? '${vehicle.model} - ' : ''}${DateFormat.y((Localizations.localeOf(context).toLanguageTag())).format(vehicle.boughtDate)}",
+            [
+              if (vehicle.make != null && vehicle.make!.isNotEmpty)
+                vehicle.make,
+              if (vehicle.model != null && vehicle.model!.isNotEmpty)
+                vehicle.model,
+              if (vehicle.modelYear != null) vehicle.modelYear,
+            ].join(" ").trim(),
             style: TextStyle(
               color: themeExtensions.textColorOnBackground.withValues(
                 alpha: 0.85,
