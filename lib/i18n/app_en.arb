@@ -977,5 +977,21 @@
         "type": "int"
       }
     }
+  },
+  "decode": "Decode",
+  "@decode": {
+    "description": "Label for the decode button"
+  },
+  "vinDecoding": "Decoding VIN...",
+  "@vinDecoding": {
+    "description": "Message shown while decoding VIN"
+  },
+  "vinDecodeError": "Failed to decode VIN",
+  "@vinDecodeError": {
+    "description": "Error message when VIN decoding fails"
+  },
+  "vinDecodeSuccess": "VIN decoded successfully",
+  "@vinDecodeSuccess": {
+    "description": "Success message when VIN is decoded"
   }
 }

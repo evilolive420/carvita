@@ -10,6 +10,7 @@ import 'package:carvita/core/constants/app_colors.dart';
 import 'package:carvita/core/theme/app_theme.dart';
 import 'package:carvita/core/widgets/gradient_background.dart';
 import 'package:carvita/data/models/vehicle.dart';
+import 'package:carvita/data/sources/remote/nhtsa_api_service.dart';
 import 'package:carvita/i18n/generated/app_localizations.dart';
 import 'package:carvita/presentation/manager/locale_provider.dart';
 import 'package:carvita/presentation/manager/upcoming_maintenance/upcoming_maintenance_cubit.dart';
@@ -40,6 +41,7 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
   Uint8List? _selectedImageBytes;
   DateTime? _selectedBoughtDate;
   int _currentStep = 1;
+  bool _isDecodingVin = false;
 
   bool get _isEditing => widget.vehicle != null;
 
@@ -179,6 +181,71 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
           Localizations.localeOf(context).toLanguageTag(),
         ).format(picked);
       });
+    }
+  }
+
+  Future<void> _decodeVin() async {
+    final vin = _vinController.text.trim();
+    if (vin.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(
+              context,
+            )!.invalidEmptyEntry(AppLocalizations.of(context)!.vin),
+          ),
+          backgroundColor: AppColors.urgentReminderText,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isDecodingVin = true;
+    });
+
+    try {
+      final service = NhtsaApiService();
+      final result = await service.decodeVin(vin);
+
+      setState(() {
+        if (result['make'] != null) {
+          _makeController.text = result['make']!;
+        }
+        if (result['model'] != null) {
+          _modelController.text = result['model']!;
+        }
+        if (result['year'] != null) {
+          _modelYearController.text = result['year']!;
+        }
+        if (result['engine'] != null) {
+          _engineNumberController.text = result['engine']!;
+        }
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.vinDecodeSuccess),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.vinDecodeError),
+            backgroundColor: AppColors.urgentReminderText,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDecodingVin = false;
+        });
+      }
     }
   }
 
@@ -400,6 +467,55 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
                     AppLocalizations.of(context)!.vehicleNicknameHint,
                     isRequired: true,
                   ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: formField(
+                          _vinController,
+                          AppLocalizations.of(context)!.vin,
+                          AppLocalizations.of(context)!.vinHint,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 18.0),
+                        child: ElevatedButton(
+                          onPressed: _isDecodingVin ? null : _decodeVin,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: bgColor,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 16,
+                              horizontal: 16,
+                            ),
+                          ),
+                          child:
+                              _isDecodingVin
+                                  ? SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color:
+                                          themeExtensions.textColorOnBackground,
+                                    ),
+                                  )
+                                  : Text(
+                                    AppLocalizations.of(context)!.decode,
+                                    style: TextStyle(
+                                      color:
+                                          isDark
+                                              ? Theme.of(
+                                                context,
+                                              ).colorScheme.onPrimary
+                                              : Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
+                                    ),
+                                  ),
+                        ),
+                      ),
+                    ],
+                  ),
                   formField(
                     _makeController,
                     AppLocalizations.of(context)!.vehicleMake,
@@ -502,11 +618,6 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
                     _plateNumberController,
                     AppLocalizations.of(context)!.plateNumber,
                     null,
-                  ),
-                  formField(
-                    _vinController,
-                    AppLocalizations.of(context)!.vin,
-                    AppLocalizations.of(context)!.vinHint,
                   ),
                   formField(
                     _engineNumberController,
