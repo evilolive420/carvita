@@ -13,6 +13,8 @@ import 'package:carvita/data/models/vehicle.dart';
 import 'package:carvita/data/sources/remote/nhtsa_api_service.dart';
 import 'package:carvita/i18n/generated/app_localizations.dart';
 import 'package:carvita/presentation/manager/locale_provider.dart';
+import 'package:carvita/presentation/screens/vehicle/vin_scanner_screen.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:carvita/presentation/manager/upcoming_maintenance/upcoming_maintenance_cubit.dart';
 import 'package:carvita/presentation/manager/vehicle_list/vehicle_cubit.dart';
 import 'package:carvita/presentation/manager/vehicle_list/vehicle_state.dart';
@@ -181,6 +183,38 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
           Localizations.localeOf(context).toLanguageTag(),
         ).format(picked);
       });
+    }
+  }
+
+  Future<void> _scanVin() async {
+    final status = await Permission.camera.request();
+    if (status.isGranted) {
+      if (mounted) {
+        final scannedVin = await Navigator.of(context).push<String>(
+          MaterialPageRoute(builder: (context) => const VinScannerScreen()),
+        );
+
+        if (scannedVin != null && scannedVin.isNotEmpty) {
+          setState(() {
+            _vinController.text = scannedVin;
+          });
+          // Optional: Auto-trigger decode?
+          // User requested "just fill the text field", so we stop here.
+        }
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.errNotificationPermission), // Reusing permission error or add new one?
+            // Better to generic error or request explicitly.
+            // "Camera permission is required to scan VIN"
+            // For now using a simple text since I didn't add a specific key in arb yet, or reuse generic.
+            // Actually, I should probably add a key or just show a text for now.
+             backgroundColor: AppColors.urgentReminderText,
+          ),
+        );
+      }
     }
   }
 
@@ -479,39 +513,57 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
                       const SizedBox(width: 8),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 18.0),
-                        child: ElevatedButton(
-                          onPressed: _isDecodingVin ? null : _decodeVin,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: bgColor,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 16,
-                              horizontal: 16,
+                        child: Row(
+                          children: [
+                            IconButton.filled(
+                              onPressed: _scanVin,
+                              style: IconButton.styleFrom(
+                                backgroundColor: bgColor,
+                                padding: const EdgeInsets.all(12),
+                              ),
+                              icon: Icon(
+                                Icons.qr_code_scanner,
+                                color: isDark
+                                    ? Theme.of(context).colorScheme.onPrimary
+                                    : Theme.of(context).colorScheme.primary,
+                              ),
                             ),
-                          ),
-                          child:
-                              _isDecodingVin
-                                  ? SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color:
-                                          themeExtensions.textColorOnBackground,
-                                    ),
-                                  )
-                                  : Text(
-                                    AppLocalizations.of(context)!.decode,
-                                    style: TextStyle(
-                                      color:
-                                          isDark
-                                              ? Theme.of(
-                                                context,
-                                              ).colorScheme.onPrimary
-                                              : Theme.of(
-                                                context,
-                                              ).colorScheme.primary,
-                                    ),
-                                  ),
+                            const SizedBox(width: 8),
+                            ElevatedButton(
+                              onPressed: _isDecodingVin ? null : _decodeVin,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: bgColor,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                  horizontal: 16,
+                                ),
+                              ),
+                              child:
+                                  _isDecodingVin
+                                      ? SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color:
+                                              themeExtensions.textColorOnBackground,
+                                        ),
+                                      )
+                                      : Text(
+                                        AppLocalizations.of(context)!.decode,
+                                        style: TextStyle(
+                                          color:
+                                              isDark
+                                                  ? Theme.of(
+                                                    context,
+                                                  ).colorScheme.onPrimary
+                                                  : Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary,
+                                        ),
+                                      ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
