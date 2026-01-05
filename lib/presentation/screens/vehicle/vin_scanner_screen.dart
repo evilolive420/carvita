@@ -56,9 +56,9 @@ class _VinScannerScreenState extends State<VinScannerScreen> {
               valueListenable: controller,
               builder: (context, state, child) {
                 switch (state.cameraDirection) {
-                  case CameraDirection.front:
+                  case CameraFacing.front:
                     return const Icon(Icons.camera_front);
-                  case CameraDirection.back:
+                  case CameraFacing.back:
                     return const Icon(Icons.camera_rear);
                 }
               },
