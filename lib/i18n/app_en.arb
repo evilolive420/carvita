@@ -957,5 +957,25 @@
   "supplyQuantityHint": "e.g. 5 qt, 1 pc",
   "@supplyQuantityHint": {
     "description": "Hint for supply quantity"
+  },
+  "next": "Next",
+  "@next": {
+    "description": "Label for the next button"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Label for the back button"
+  },
+  "stepTitle": "Step {current} of {total}",
+  "@stepTitle": {
+    "description": "Title indicating the current step in a multi-step process",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
   }
 }
