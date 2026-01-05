@@ -40,7 +40,7 @@ class _VinScannerScreenState extends State<VinScannerScreen> {
                     return const Icon(Icons.flash_off, color: Colors.grey);
                   case TorchState.on:
                     return const Icon(Icons.flash_on, color: Colors.yellow);
-                  case TorchState.auto: // Handle auto if needed, or default to off icon
+                  case TorchState.auto:
                      return const Icon(Icons.flash_auto, color: Colors.white);
                   case TorchState.unavailable:
                      return const Icon(Icons.no_flash, color: Colors.grey);
