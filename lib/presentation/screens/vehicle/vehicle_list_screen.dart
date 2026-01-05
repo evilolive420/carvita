@@ -212,25 +212,38 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        (vehicle.model != null && vehicle.model!.isNotEmpty)
-                            ? Text(
-                              "${AppLocalizations.of(context)!.vehicleModel}: ${vehicle.model!}",
-                              style: TextStyle(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withValues(alpha: 0.7),
-                                fontSize: 13,
-                              ),
-                            )
-                            : Text(
-                              AppLocalizations.of(context)!.unknownModel,
-                              style: TextStyle(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withValues(alpha: 0.7),
-                                fontSize: 13,
-                              ),
-                            ),
+                        Text(
+                          [
+                            if (vehicle.make != null &&
+                                vehicle.make!.isNotEmpty)
+                              vehicle.make,
+                            if (vehicle.model != null &&
+                                vehicle.model!.isNotEmpty)
+                              vehicle.model,
+                            if (vehicle.modelYear != null)
+                              '(${vehicle.modelYear})',
+                          ].join(" ").trim().isNotEmpty
+                              ? [
+                                if (vehicle.make != null &&
+                                    vehicle.make!.isNotEmpty)
+                                  vehicle.make,
+                                if (vehicle.model != null &&
+                                    vehicle.model!.isNotEmpty)
+                                  vehicle.model,
+                                if (vehicle.trim != null &&
+                                    vehicle.trim!.isNotEmpty)
+                                  vehicle.trim,
+                                if (vehicle.modelYear != null)
+                                  '(${vehicle.modelYear})',
+                              ].join(" ")
+                              : AppLocalizations.of(context)!.unknownModel,
+                          style: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.7),
+                            fontSize: 13,
+                          ),
+                        ),
                       ],
                     ),
                     trailing: Row(

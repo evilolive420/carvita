@@ -17,11 +17,14 @@ dependencies:
   flutter_local_notifications: ^19.2.1
   flutter_localizations:
     sdk: flutter
+  http: ^1.2.0
   image_picker: ^1.1.2
   intl: any
+  mobile_scanner: ^6.0.4
   package_info_plus: ^8.3.0
   path: ^1.9.1
   path_provider: ^2.1.5
+  permission_handler: ^11.3.1
   provider: ^6.1.5
   quick_actions: ^1.1.0
   share_plus: ^11.0.0

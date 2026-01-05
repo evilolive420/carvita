@@ -17,7 +17,7 @@ class DatabaseHelper {
 
   static Database? _database;
   static const String dbName = 'carvita_v1.db';
-  static const int _dbVersion = 4;
+  static const int _dbVersion = 6;
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -45,6 +45,32 @@ class DatabaseHelper {
     if (oldVersion < 4) {
       await _createMaintenanceSuppliesTable(db);
     }
+    if (oldVersion < 5) {
+      await _updateVehiclesTableV5(db);
+      await _createMakesTable(db);
+    }
+    if (oldVersion < 6) {
+      await _updateVehiclesTableV6(db);
+    }
+  }
+
+  Future<void> _updateVehiclesTableV6(Database db) async {
+    await db.execute('ALTER TABLE vehicles ADD COLUMN trim TEXT');
+  }
+
+  Future<void> _createMakesTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE makes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL
+      )
+    ''');
+  }
+
+  Future<void> _updateVehiclesTableV5(Database db) async {
+    // Add new columns to vehicles table
+    await db.execute('ALTER TABLE vehicles ADD COLUMN make TEXT');
+    await db.execute('ALTER TABLE vehicles ADD COLUMN model_year INTEGER');
   }
 
   Future<void> _createMaintenanceSuppliesTable(Database db) async {
@@ -238,12 +264,17 @@ class DatabaseHelper {
         mileage_last_updated TEXT NOT NULL,
         bought_date TEXT NOT NULL,
         image BLOB,
+        make TEXT,
         model TEXT,
+        trim TEXT,
+        model_year INTEGER,
         plate_number TEXT,
         vin TEXT,
         engine_number TEXT
       )
     ''');
+
+    await _createMakesTable(db);
 
     await db.execute('''
       CREATE TABLE maintenance_plan_items (

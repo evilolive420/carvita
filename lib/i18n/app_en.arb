@@ -733,6 +733,43 @@
   "@vehicleModelHint": {
     "description": "The hint for the vehicle model field in the vehicle info screen"
   },
+  "vehicleMake": "Make",
+  "@vehicleMake": {
+    "description": "The label for the vehicle make field in the vehicle info screen"
+  },
+  "vehicleMakeHint": "e.g. Tesla",
+  "@vehicleMakeHint": {
+    "description": "The hint for the vehicle make field in the vehicle info screen"
+  },
+  "vehicleTrim": "Trim",
+  "@vehicleTrim": {
+    "description": "The label for the vehicle trim field"
+  },
+  "vehicleTrimHint": "e.g. ZL1",
+  "@vehicleTrimHint": {
+    "description": "The hint for the vehicle trim field"
+  },
+  "useSeriesAsTrimTitle": "Trim not found",
+  "@useSeriesAsTrimTitle": {
+    "description": "Title for the dialog asking to use series as trim"
+  },
+  "useSeriesAsTrimBody": "Trim was not found in the decoded data. Do you want to use the Series \"{series}\" instead?",
+  "@useSeriesAsTrimBody": {
+    "description": "Body for the dialog asking to use series as trim",
+    "placeholders": {
+      "series": {
+        "type": "String"
+      }
+    }
+  },
+  "vehicleYear": "Model year",
+  "@vehicleYear": {
+    "description": "The label for the vehicle model year field in the vehicle info screen"
+  },
+  "vehicleYearHint": "e.g. 2024",
+  "@vehicleYearHint": {
+    "description": "The hint for the vehicle model year field in the vehicle info screen"
+  },
   "vinHint": "Vehicle Identification Number",
   "@vinHint": {
     "description": "The hint for the VIN field in the vehicle info screen"
@@ -941,5 +978,41 @@
   "supplyQuantityHint": "e.g. 5 qt, 1 pc",
   "@supplyQuantityHint": {
     "description": "Hint for supply quantity"
+  },
+  "next": "Next",
+  "@next": {
+    "description": "Label for the next button"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Label for the back button"
+  },
+  "stepTitle": "Step {current} of {total}",
+  "@stepTitle": {
+    "description": "Title indicating the current step in a multi-step process",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "decode": "Decode",
+  "@decode": {
+    "description": "Label for the decode button"
+  },
+  "vinDecoding": "Decoding VIN...",
+  "@vinDecoding": {
+    "description": "Message shown while decoding VIN"
+  },
+  "vinDecodeError": "Failed to decode VIN",
+  "@vinDecodeError": {
+    "description": "Error message when VIN decoding fails"
+  },
+  "vinDecodeSuccess": "VIN decoded successfully",
+  "@vinDecodeSuccess": {
+    "description": "Success message when VIN is decoded"
   }
 }
