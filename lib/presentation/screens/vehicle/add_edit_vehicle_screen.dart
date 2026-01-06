@@ -11,6 +11,11 @@ import 'package:carvita/core/theme/app_theme.dart';
 import 'package:carvita/core/widgets/gradient_background.dart';
 import 'package:carvita/data/models/vehicle.dart';
 import 'package:carvita/data/sources/remote/nhtsa_api_service.dart';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 import 'package:carvita/i18n/generated/app_localizations.dart';
 import 'package:carvita/presentation/manager/locale_provider.dart';
 import 'package:carvita/presentation/screens/vehicle/vin_scanner_screen.dart';
@@ -189,15 +194,40 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
   }
 
   Future<void> _scanVin() async {
-    if (mounted) {
-      final scannedVin = await Navigator.of(context).push<String>(
-        MaterialPageRoute(builder: (context) => const VinScannerScreen()),
-      );
+    // Only allow scanning on mobile platforms
+    if (kIsWeb || (!Platform.isAndroid && !Platform.isIOS)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("VIN scanning is only supported on mobile devices."),
+            backgroundColor: AppColors.urgentReminderText,
+          ),
+        );
+      }
+      return;
+    }
 
-      if (scannedVin != null && scannedVin.isNotEmpty) {
-        setState(() {
-          _vinController.text = scannedVin;
-        });
+    final status = await Permission.camera.request();
+    if (status.isGranted) {
+      if (mounted) {
+        final scannedVin = await Navigator.of(context).push<String>(
+          MaterialPageRoute(builder: (context) => const VinScannerScreen()),
+        );
+
+        if (scannedVin != null && scannedVin.isNotEmpty) {
+          setState(() {
+            _vinController.text = scannedVin;
+          });
+        }
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.errNotificationPermission),
+             backgroundColor: AppColors.urgentReminderText,
+          ),
+        );
       }
     }
   }
@@ -534,20 +564,28 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
                         padding: const EdgeInsets.only(bottom: 18.0),
                         child: Row(
                           children: [
-                            IconButton.filled(
-                              onPressed: _scanVin,
-                              style: IconButton.styleFrom(
-                                backgroundColor: bgColor,
-                                padding: const EdgeInsets.all(12),
+                            if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
+                              Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: IconButton.filled(
+                                  onPressed: _scanVin,
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: bgColor,
+                                    padding: const EdgeInsets.all(12),
+                                  ),
+                                  icon: Icon(
+                                    Icons.qr_code_scanner,
+                                    color:
+                                        isDark
+                                            ? Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimary
+                                            : Theme.of(
+                                              context,
+                                            ).colorScheme.primary,
+                                  ),
+                                ),
                               ),
-                              icon: Icon(
-                                Icons.qr_code_scanner,
-                                color: isDark
-                                    ? Theme.of(context).colorScheme.onPrimary
-                                    : Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
                             ElevatedButton(
                               onPressed: _isDecodingVin ? null : _decodeVin,
                               style: ElevatedButton.styleFrom(
