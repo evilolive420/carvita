@@ -14,7 +14,6 @@ import 'package:carvita/data/sources/remote/nhtsa_api_service.dart';
 import 'package:carvita/i18n/generated/app_localizations.dart';
 import 'package:carvita/presentation/manager/locale_provider.dart';
 import 'package:carvita/presentation/screens/vehicle/vin_scanner_screen.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:carvita/presentation/manager/upcoming_maintenance/upcoming_maintenance_cubit.dart';
 import 'package:carvita/presentation/manager/vehicle_list/vehicle_cubit.dart';
 import 'package:carvita/presentation/manager/vehicle_list/vehicle_state.dart';
@@ -190,27 +189,15 @@ class _AddEditVehicleScreenState extends State<AddEditVehicleScreen> {
   }
 
   Future<void> _scanVin() async {
-    final status = await Permission.camera.request();
-    if (status.isGranted) {
-      if (mounted) {
-        final scannedVin = await Navigator.of(context).push<String>(
-          MaterialPageRoute(builder: (context) => const VinScannerScreen()),
-        );
+    if (mounted) {
+      final scannedVin = await Navigator.of(context).push<String>(
+        MaterialPageRoute(builder: (context) => const VinScannerScreen()),
+      );
 
-        if (scannedVin != null && scannedVin.isNotEmpty) {
-          setState(() {
-            _vinController.text = scannedVin;
-          });
-        }
-      }
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.errNotificationPermission),
-             backgroundColor: AppColors.urgentReminderText,
-          ),
-        );
+      if (scannedVin != null && scannedVin.isNotEmpty) {
+        setState(() {
+          _vinController.text = scannedVin;
+        });
       }
     }
   }
